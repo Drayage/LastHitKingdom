@@ -1,0 +1,2 @@
+import { APP_CONFIG } from './app-config.js';
+const badge=document.createElement('button'); badge.textContent=`${APP_CONFIG.APP_VERSION}`; badge.style.cssText='position:fixed;right:8px;bottom:8px;z-index:99'; let taps=0; badge.onclick=()=>{ if(++taps>=5){ localStorage.clear(); location.reload(); } }; document.body.append(badge); window.addEventListener('error',e=>{ const pre=document.createElement('pre'); pre.textContent=e.message; pre.style.cssText='position:fixed;inset:16px;background:#7f1d1d;color:white;padding:16px;z-index:1000'; document.body.append(pre); });

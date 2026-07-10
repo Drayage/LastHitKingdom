@@ -1,0 +1,11 @@
+import { createInitialGameState } from './game/state/create-state.js';
+import { dispatchGameAction } from './game/state/reducer.js';
+import { chooseAutoAction } from './game/ai/policy.js';
+import { render } from './ui.js';
+import './devtools.js';
+let state = createInitialGameState({ playerNames:['Knight','General','Ranger','Lord'] });
+const rng = () => Math.random();
+document.getElementById('new-game').addEventListener('click',()=>{ state=createInitialGameState({ playerNames:['Knight','General','Ranger','Lord'] }); render(state); });
+document.getElementById('board').addEventListener('click',()=>{ if(state.phase==='GAME_OVER') return; const p=state.players.find(x=>x.id===state.currentPlayerId); dispatchGameAction(state,{ type:'ROLL_MOVE', playerId:p.id, steps:2+Math.floor(rng()*11), endTurn:false }); if(state.phase!=='GAME_OVER') dispatchGameAction(state, chooseAutoAction(state,p.id,rng)); render(state); });
+render(state);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');

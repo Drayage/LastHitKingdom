@@ -1,0 +1,5 @@
+import { TRAITS } from '../config/traits.js';
+import { BALANCE_CONFIG } from '../config/balance.js';
+export function generateTraitOffer(state, playerId) { const p = state.players.find(x=>x.id===playerId); const max = Math.max(...state.players.map(x=>x.level)); const diff = max - p.level; const rule = diff >= 2 ? BALANCE_CONFIG.traitOffer.twoOrMoreLevelsBehind : diff === 1 ? BALANCE_CONFIG.traitOffer.oneLevelBehind : BALANCE_CONFIG.traitOffer.sameLevel; return { options: state.sharedTraitPool.slice(0, rule.optionCount).map(id => TRAITS.find(t=>t.id===id)), rerollCount: rule.rerollCount }; }
+export function rerollTraitOffer(state, previousIds, count) { return state.sharedTraitPool.filter(id=>!previousIds.includes(id)).slice(0,count); }
+export function acquireTrait(state, playerId, traitId) { if (!state.sharedTraitPool.includes(traitId)) return false; const p = state.players.find(x=>x.id===playerId); p.acquiredTraitIds.push(traitId); state.sharedTraitPool = state.sharedTraitPool.filter(id=>id!==traitId); state.acquiredTraitOwnerMap[traitId] = playerId; return true; }

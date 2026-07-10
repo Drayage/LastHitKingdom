@@ -1,0 +1,3 @@
+export function chooseAutoAction(state, playerId, rng = Math.random) { const p = state.players.find(x=>x.id===playerId); const tile = state.board[p.position]; if (tile.type === 'TERRITORY') { const t = state.territories[tile.territoryId]; if (!t.ownerId) return { type:'ATTACK_MONSTER', playerId, territoryId:t.id, directTroops: Math.min(p.troops, t.monsterCurrentHp), endTurn:true }; if (t.ownerId === playerId && t.level < 3) return { type:'UPGRADE', playerId, territoryId:t.id, endTurn:true }; if (t.ownerId !== playerId) return { type:'CONQUEST', playerId, territoryId:t.id, directTroops: Math.max(0, Math.floor(p.troops / 2)), endTurn:true }; }
+  return { type:'ROLL_MOVE', playerId, steps: 2 + Math.floor(rng()*11), endTurn:true };
+}

@@ -1,0 +1,1 @@
+{"rules":{"apps":{"last-hit-kingdom":{"rooms":{"$roomId":{".read":true,".write":true,"state":{".validate":"newData.child('seq').isNumber()"}}}}}}}
