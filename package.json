@@ -1,0 +1,1 @@
+{"type":"module","scripts":{"test":"node --test","simulate":"node scripts/simulate.mjs --players=4 --games=20 --seed=1234"},"devDependencies":{}}

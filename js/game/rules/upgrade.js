@@ -1,0 +1,2 @@
+import { BALANCE_CONFIG, scaledValue } from '../config/balance.js';
+export function upgradeTerritory(state, playerId, territoryId) { const p = state.players.find(x=>x.id===playerId); const t = state.territories[territoryId]; if (!p || !t || t.ownerId !== playerId || t.level >= 3) return false; const cost = scaledValue(BALANCE_CONFIG.territoryLevel[t.level + 1].upgradeCost, t.line); if (p.troops < cost) return false; p.troops -= cost; t.level += 1; state.actionLog.push({ type:'UPGRADE', playerId, territoryId, cost, level:t.level }); return true; }

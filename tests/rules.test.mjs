@@ -1,0 +1,13 @@
+import test from 'node:test'; import assert from 'node:assert/strict';
+import { createInitialGameState } from '../js/game/state/create-state.js';
+import { attackMonster } from '../js/game/rules/monster.js';
+import { calculateFriendlySupport } from '../js/game/rules/support.js';
+import { calculatePassageDamage } from '../js/game/rules/passage.js';
+import { upgradeTerritory } from '../js/game/rules/upgrade.js';
+import { releaseTerritory } from '../js/game/rules/release.js';
+import { acquireTrait, generateTraitOffer } from '../js/game/rules/traits.js';
+import { damageBoss } from '../js/game/rules/boss.js';
+import { checkLineConquest } from '../js/game/rules/victory.js';
+test('monster last hit grants territory',()=>{ const s=createInitialGameState(); const id='t-1'; attackMonster(s,'player-1',id,5); assert.equal(s.territories[id].ownerId,null); attackMonster(s,'player-2',id,20); assert.equal(s.territories[id].ownerId,'player-2'); });
+test('adjacent support ignores enemies for monster attacks',()=>{ const s=createInitialGameState(); s.territories['t-1'].ownerId='player-1'; s.territories['t-1'].level=1; s.territories['t-3'].ownerId='player-2'; s.territories['t-3'].level=1; assert.equal(calculateFriendlySupport(s,'t-2','player-1'),2); });
+test('passage, upgrade, release, traits, boss, line victory work',()=>{ const s=createInitialGameState(); s.territories['t-1'].ownerId='player-1'; s.territories['t-1'].level=1; s.players[0].ownedTerritoryIds=['t-1']; assert.ok(calculatePassageDamage(s,'t-1')>=6); assert.equal(upgradeTerritory(s,'player-1','t-1'),true); assert.equal(s.territories['t-1'].level,2); const before=s.players[0].troops; assert.ok(releaseTerritory(s,'player-1','t-1')>0); assert.ok(s.players[0].troops>before); const offer=generateTraitOffer(s,'player-1'); assert.ok(offer.options.length); assert.equal(acquireTrait(s,'player-1',offer.options[0].id),true); s.territories['t-1'].ownerId='player-1'; s.territories['t-1'].level=3; s.players[0].ownedTerritoryIds=['t-1']; assert.ok(damageBoss(s,'player-1').damage>0); for (const t of Object.values(s.territories).filter(t=>t.line===1)) t.ownerId='player-1'; assert.equal(checkLineConquest(s).victoryType,'LINE_CONQUEST'); });
