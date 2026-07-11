@@ -24,11 +24,13 @@ function boardPosition(i,total){
   const counts=[0,1,2,3].map(n=>base+(n<extra?1:0));
   let segment=0,start=0;
   while(segment<3&&i>=start+counts[segment]){start+=counts[segment];segment++;}
-  const offset=i-start, pct=((offset+.5)/counts[segment])*100;
-  if(segment===0) return `grid-area:top;left:${pct}%`;
-  if(segment===1) return `grid-area:right;top:${pct}%`;
-  if(segment===2) return `grid-area:bottom;right:${pct}%`;
-  return `grid-area:left;bottom:${pct}%`;
+  const offset=i-start, ratio=offset/counts[segment];
+  const horizontal=`calc(52px + ${ratio*100}% - ${104*ratio}px)`;
+  const vertical=`calc(41px + ${ratio*100}% - ${82*ratio}px)`;
+  if(segment===0) return `--edge:top;left:${horizontal}`;
+  if(segment===1) return `--edge:right;top:${vertical}`;
+  if(segment===2) return `--edge:bottom;right:${horizontal}`;
+  return `--edge:left;bottom:${vertical}`;
 }
 function tileMarkup(state,tile,index){
   const t=tile.territoryId?state.territories[tile.territoryId]:null;

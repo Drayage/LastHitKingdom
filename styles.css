@@ -4,6 +4,10 @@
 @media(max-width:560px){.player-title small,.traits{display:none}.player-stats{gap:7px;font-size:10px}.board{grid-template-columns:65px 1fr 65px;grid-template-rows:72px 360px 72px;border-width:7px}.tile{width:58px;height:62px;border-width:2px}.tile strong{font-size:8px}.tile-state{font-size:12px}.tokens{grid-template-columns:repeat(2,15px)}.token{width:15px;height:15px;font-size:7px}.boss-center{width:65%;padding:8px}.boss-center h2{font-size:18px}.dragon{font-size:36px}.victory-progress{display:none}.detail-grid{grid-template-columns:1fr}.trait-grid{grid-template-columns:1fr}.actions{flex-wrap:wrap}.action-panel h2{font-size:18px}}
 
 /* Refined board rhythm: smaller tiles, clear corners, quieter center. */
+.tile[style*="--edge:right"]{transform:translate(0,-50%);right:4px!important;left:auto!important}
+.tile[style*="--edge:bottom"]{transform:translate(50%,0);bottom:4px!important;top:auto!important}
+.tile[style*="--edge:left"]{transform:translate(0,50%);left:4px!important;right:auto!important}
+.tile[style*="--edge:top"]{top:4px}
 @media(min-width:901px){
   .board{grid-template-columns:112px 1fr 112px;grid-template-rows:94px minmax(460px,55vh) 94px;border:10px solid #704127;background:radial-gradient(ellipse at center,#5b784b 0 42%,#3e6535 70%,#294426 100%);box-shadow:inset 0 0 0 4px #bf8650,inset 0 0 55px #182516aa,0 10px 30px #32180d88}
   .board:after{content:'⚜';bottom:12px;font-size:18px}
@@ -12,6 +16,7 @@
   .tile[style*="grid-area:bottom"]{bottom:7px!important}
   .tile[style*="grid-area:left"]{left:7px!important}
   .tile[style*="grid-area:top"]{top:7px}
+  .tile[style*="--edge:right"]{right:7px!important}.tile[style*="--edge:bottom"]{bottom:7px!important}.tile[style*="--edge:left"]{left:7px!important}.tile[style*="--edge:top"]{top:7px}
   .tile strong{font-size:11px;line-height:1.1}
   .boss-center{width:min(430px,68%);padding:16px 20px;border-width:3px;border-radius:18px;box-shadow:0 8px 24px #1b140e66}
   .dragon{font-size:48px}.boss-center h2{font-size:23px}.boss-center p{margin:5px 0}.turn-info{padding:6px}.victory-progress{margin-top:6px}
