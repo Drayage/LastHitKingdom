@@ -9,6 +9,20 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <section id="title-screen" class="title-screen">
+    <div class="title-card">
+      <span class="title-crown">♛</span>
+      <p class="title-kicker">판타지 영토 정복 보드게임</p>
+      <h1>Last Hit<br><b>Kingdom</b></h1>
+      <p class="title-copy">병력을 모으고 영토를 정복해 왕국의 마지막 왕이 되세요.</p>
+      <div class="setup-box">
+        <div class="setup-heading"><h2>새 게임 설정</h2><label>플레이어 수 <select id="player-count"><option value="2">2명</option><option value="3">3명</option><option value="4" selected>4명</option></select></label></div>
+        <div id="player-setup" class="player-setup"></div>
+        <div class="mode-legend"><span>👤 사람(로컬)</span><span>🤖 AI</span><span>🌐 사람(온라인) <small>준비 중</small></span></div>
+        <button id="start-game" class="start-game">모험 시작</button>
+      </div>
+    </div>
+  </section>
   <main id="app">
     <header class="topbar">
       <div><span class="eyebrow">판타지 영토 정복 보드게임</span><h1>⚜ Last Hit Kingdom</h1></div>

@@ -9,6 +9,7 @@ export const PLAYER_COLORS = ['#38bdf8','#fb7185','#a3e635','#c084fc'];
 const TILE_ICONS = { CAPITAL:'🏰', WAR_COUNCIL:'⚔️', GATE:'🌀', PRISON:'⛓️', BOSS:'🐉', EVENT:'📜', TERRITORY:'👹' };
 const JOBS = { knight:'기사', general:'장군', ranger:'레인저', lord:'영주' };
 const TRAIT_ICONS = { 'sure-step':'🥾','gate-sage':'🔮','siege-ledger':'📕','monster-scouts':'🦅','safe-roads':'🛡️',salvager:'⚒️','boss-hunter':'🐲',builder:'🏗️' };
+const CONTROL_ICONS = { LOCAL:'👤', AI:'🤖', ONLINE:'🌐' };
 
 function player(state,id){ return state.players.find(p=>p.id===id); }
 function territoryAt(state,p){ const tile=state.board[p.position]; return tile.territoryId ? state.territories[tile.territoryId] : null; }
@@ -46,7 +47,7 @@ function tileMarkup(state,tile,index){
 }
 function renderPlayers(state){
   document.getElementById('player-cards').innerHTML=state.players.map((p,i)=>`<article class="player-card ${p.id===state.currentPlayerId?'current':''} ${p.isEliminated?'eliminated':''}" style="--player:${PLAYER_COLORS[i]}">
-    <div class="player-title"><span class="portrait">${JOBS[p.jobId]?.[0]??'♟'}</span><div><strong>${p.name}</strong><small>${p.jobId?JOBS[p.jobId]:'모험가'} · ${lineLabel(state.board[p.position].line)}</small></div><span class="turn-crown">♛</span></div>
+    <div class="player-title"><span class="portrait">${JOBS[p.jobId]?.[0]??'♟'}</span><div><strong>${p.name} <em class="control-badge">${CONTROL_ICONS[p.controlType]??'👤'}</em></strong><small>${p.jobId?JOBS[p.jobId]:'모험가'} · ${lineLabel(state.board[p.position].line)}</small></div><span class="turn-crown">♛</span></div>
     <div class="player-stats"><span>⚔ ${p.troops}</span><span>★ Lv.${p.level}</span><span>⚑ ${p.ownedTerritoryIds.length}</span><span>↻ ${p.lapCount}</span></div>
     <div class="traits">${p.acquiredTraitIds.map(id=>`<span title="${TRAITS.find(t=>t.id===id)?.name}">${TRAIT_ICONS[id]??'✦'}</span>`).join('')||'<small>특성 없음</small>'}${p.pendingWarCouncil?'<span title="전쟁회의 효과">🎲🎲</span>':''}</div>
   </article>`).join('');
