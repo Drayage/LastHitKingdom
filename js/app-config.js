@@ -1,7 +1,7 @@
 export const APP_CONFIG = {
   APP_ID: 'last-hit-kingdom',
   APP_NAME: 'Last Hit Kingdom',
-  APP_VERSION: '0.2.1',
+  APP_VERSION: '0.3.0',
   FIREBASE_NAMESPACE: 'apps/last-hit-kingdom',
   firebaseConfig: {
     apiKey: 'shared-project-api-key',
