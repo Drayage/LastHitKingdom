@@ -5,7 +5,7 @@ import { releaseTerritory } from './game/rules/release.js';
 import { generateTraitOffer, acquireTrait, rerollTraitOffer } from './game/rules/traits.js';
 import { TRAITS } from './game/config/traits.js';
 import { chooseAutoAction } from './game/ai/policy.js';
-import { render, renderActionPanel, territoryPreview, modalMarkup, tileAtPlayer, currentTerritory } from './ui.js';
+import { render, renderActionPanel, territoryPreview, modalMarkup, tileAtPlayer, currentTerritory } from './ui.js?v=0.3.0';
 import './devtools.js';
 
 let state=createInitialGameState({playerNames:['기사','장군','레인저','영주']});

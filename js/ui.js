@@ -41,9 +41,9 @@ function tileMarkup(state,tile,index){
   const detail=t ? (owner
     ? `<span class="tile-state building">${building(t.level)} <b>Lv.${t.level}</b></span><span class="tile-stat">⚔ 통행 ${calculatePassageDamage(state,t.id)}</span>`
     : `<span class="tile-state monster">👹 <b>${t.monsterCurrentHp}/${t.monsterMaxHp}</b></span>`) : `<span class="tile-state special-icon">${TILE_ICONS[tile.type]??'✦'}</span>`;
-  return `<article class="tile line-${tile.line} ${tile.type} ${isCornerTile(index,state.board.length)?'corner-tile':''}" data-index="${index}" style="${boardPosition(index,state.board.length)};--owner:${ownerIndex>=0?PLAYER_COLORS[ownerIndex]:'transparent'}">
+  return `<article class="tile line-${tile.line} ${tile.type} ${owner?'owned':''} ${isCornerTile(index,state.board.length)?'corner-tile':''}" data-index="${index}" style="${boardPosition(index,state.board.length)};--owner:${ownerIndex>=0?PLAYER_COLORS[ownerIndex]:'transparent'}">
     <span class="line-badge">${lineLabel(tile.line)}</span><strong>${tile.name}</strong>${detail}
-    ${owner?`<span class="owner-flag" title="${owner.name}">⚑</span>`:''}<div class="tokens">${tokenMarkup(state,index)}</div>
+    ${owner?`<span class="owner-label" title="${owner.name} 소유"><i></i>${owner.name}</span>`:''}<div class="tokens">${tokenMarkup(state,index)}</div>
   </article>`;
 }
 function renderPlayers(state){
