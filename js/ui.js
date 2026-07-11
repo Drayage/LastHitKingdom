@@ -37,8 +37,8 @@ function tileMarkup(state,tile,index){
   const owner=t?.ownerId?player(state,t.ownerId):null;
   const ownerIndex=owner?state.players.indexOf(owner):-1;
   const detail=t ? (owner
-    ? `<span class="tile-state">${building(t.level)} Lv.${t.level}</span><span class="tile-stat">통행 ${calculatePassageDamage(state,t.id)}</span>`
-    : `<span class="tile-state">👹 ${t.monsterCurrentHp}/${t.monsterMaxHp}</span>`) : `<span class="tile-state">${TILE_ICONS[tile.type]??'✦'}</span>`;
+    ? `<span class="tile-state building">${building(t.level)} <b>Lv.${t.level}</b></span><span class="tile-stat">⚔ 통행 ${calculatePassageDamage(state,t.id)}</span>`
+    : `<span class="tile-state monster">👹 <b>${t.monsterCurrentHp}/${t.monsterMaxHp}</b></span>`) : `<span class="tile-state special-icon">${TILE_ICONS[tile.type]??'✦'}</span>`;
   return `<article class="tile line-${tile.line} ${tile.type}" data-index="${index}" style="${boardPosition(index,state.board.length)};--owner:${ownerIndex>=0?PLAYER_COLORS[ownerIndex]:'transparent'}">
     <span class="line-badge">${lineLabel(tile.line)}</span><strong>${tile.name}</strong>${detail}
     ${owner?`<span class="owner-flag" title="${owner.name}">⚑</span>`:''}<div class="tokens">${tokenMarkup(state,index)}</div>
@@ -54,7 +54,7 @@ function renderPlayers(state){
 function renderBoss(state){
   const current=player(state,state.currentPlayerId), hp=Math.round(state.boss.currentHp/state.boss.maxHp*100);
   const lines=[1,2,3,4].map(line=>{const ts=Object.values(state.territories).filter(t=>t.line===line),owned=ts.filter(t=>t.ownerId===current?.id).length;return `<span>${line}라인 ${owned}/${ts.length}</span>`}).join('');
-  document.getElementById('boss-center').innerHTML=`<div class="dragon">🐉</div><h2>고대의 용</h2><div class="hp-label"><span>보스 HP</span><b>${state.boss.currentHp}/${state.boss.maxHp}</b></div><div class="hp"><i style="width:${hp}%"></i></div><p>통과 예상 피해 <b>${current?calculateBossDamage(state,current.id):0}</b></p><div class="turn-info">턴 ${state.turnNumber} · <b>${current?.name??'-'}</b></div><div class="victory-progress">${lines}<span>🐉 ${100-hp}%</span></div>`;
+  document.getElementById('boss-center').innerHTML=`<div class="boss-statue"><span class="dragon">🐉</span><i></i></div><div class="boss-copy"><span class="eyebrow">왕국 중앙 광장</span><h2>고대의 용</h2><div class="hp-label"><span>보스 HP</span><b>${state.boss.currentHp}/${state.boss.maxHp}</b></div><div class="hp"><i style="width:${hp}%"></i></div><p>통과 예상 피해 <b>${current?calculateBossDamage(state,current.id):0}</b></p><div class="turn-info">턴 ${state.turnNumber} · <b>${current?.name??'-'}</b></div><div class="victory-progress">${lines}<span>🐉 ${100-hp}%</span></div></div>`;
 }
 export function naturalLog(state,e){
   const p=player(state,e.playerId??e.attackerId)?.name??'플레이어', t=state.territories[e.territoryId]?.name;
