@@ -4,6 +4,7 @@ import { calculatePassageDamage } from './game/rules/passage.js';
 import { releaseTerritory } from './game/rules/release.js';
 import { generateTraitOffer, acquireTrait, rerollTraitOffer } from './game/rules/traits.js';
 import { TRAITS } from './game/config/traits.js';
+import { chooseAutoAction } from './game/ai/policy.js';
 import { render, renderActionPanel, territoryPreview, modalMarkup, tileAtPlayer, currentTerritory } from './ui.js';
 import './devtools.js';
 
@@ -12,28 +13,29 @@ let ui={phase:'ROLL',dice:null,rolling:false};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const current=()=>state.players.find(p=>p.id===state.currentPlayerId);
 
-function newGame(){ state=createInitialGameState({playerNames:['기사','장군','레인저','영주'],seed:Date.now()}); ui={phase:'ROLL'}; render(state,ui); }
+function newGame(configs){ state=createInitialGameState({playerConfigs:configs,seed:Date.now()}); ui={phase:'ROLL'}; render(state,ui); scheduleAiTurn(); }
 function endTurn(){
   dispatchGameAction(state,{type:'END_TURN'}); ui={phase:'ROLL',dice:null}; render(state,ui);
+  scheduleAiTurn();
 }
-async function rollDice(){
+async function rollDice(auto=false){
   if(ui.phase!=='ROLL'||state.phase==='GAME_OVER') return;
   ui.rolling=true; renderActionPanel(state,ui);
   for(let i=0;i<8;i++){ui.dice=[1+Math.floor(Math.random()*6),1+Math.floor(Math.random()*6)];renderActionPanel(state,ui);await wait(70+i*12);}
   ui.rolling=false; const steps=ui.dice[0]+ui.dice[1];
   state.actionLog.push({type:'ROLL_MOVE',playerId:current().id,dice:[...ui.dice],steps});
-  await animateMove(steps);
+  await animateMove(steps,auto);
 }
-async function animateMove(steps){
+async function animateMove(steps,auto=false){
   ui={phase:'MOVING',remaining:steps}; render(state,ui);
   for(let i=0;i<steps;i++){
     dispatchGameAction(state,{type:'ROLL_MOVE',playerId:current().id,steps:1,endTurn:false});
     ui.remaining=steps-i-1; render(state,ui); await wait(230);
     if(state.phase==='GAME_OVER') return render(state,ui);
   }
-  resolveArrival();
+  resolveArrival(auto);
 }
-function resolveArrival(){
+function resolveArrival(auto=false){
   const p=current(), tile=tileAtPlayer(state), t=currentTerritory(state);
   if(tile.type==='TERRITORY'&&t?.ownerId&&t.ownerId!==p.id){
     const damage=Math.min(p.troops,calculatePassageDamage(state,t.id)); p.troops-=damage; state.actionLog.push({type:'PASSAGE_DAMAGE',playerId:p.id,territoryId:t.id,damage});
@@ -47,6 +49,25 @@ function resolveArrival(){
   else if(tile.type==='WAR_COUNCIL') actions='<button data-action="council" class="primary">⚔ 전쟁회의 참가</button>';
   else actions='<button data-action="skip" class="primary">턴 마치기</button>';
   ui={phase:'ARRIVAL',actions}; render(state,ui);
+  if(auto)setTimeout(()=>resolveAiArrival(tile,t),450);
+}
+function resolveAiArrival(tile,t){
+  const p=current();
+  if(tile.type==='TERRITORY'){
+    const action=chooseAutoAction(state,p.id,Math.random);
+    if(action.type!=='ROLL_MOVE')dispatchGameAction(state,{...action,endTurn:false});
+  }else if(tile.type==='WAR_COUNCIL')p.pendingWarCouncil=true;
+  else if(tile.type==='GATE'){
+    const target=state.board.findIndex((candidate,index)=>candidate.type==='GATE'&&index!==p.position);
+    if(target>=0){p.position=target;state.actionLog.push({type:'GATE_TRAVEL',playerId:p.id});}
+  }else if(tile.type==='PRISON'){
+    const a=1+Math.floor(Math.random()*6),b=1+Math.floor(Math.random()*6);p.isInPrison=a!==b;
+  }
+  render(state,ui);setTimeout(endTurn,450);
+}
+function scheduleAiTurn(){
+  if(state.phase==='GAME_OVER'||current()?.controlType!=='AI')return;
+  ui={phase:'ROLL',dice:null};render(state,ui);setTimeout(()=>rollDice(true),650);
 }
 function openDecision(kind){
   const t=currentTerritory(state), data=territoryPreview(state,t.id,kind), root=document.getElementById('modal-root');
@@ -90,7 +111,18 @@ document.addEventListener('click',e=>{
   const action=e.target.closest('[data-action]')?.dataset.action;if(!action)return;
   if(['monster','upgrade','conquest'].includes(action))openDecision(action);else if(action==='gate')gateChoice();else if(action==='council'){current().pendingWarCouncil=true;endTurn();}else if(action==='prison'){const a=1+Math.floor(Math.random()*6),b=1+Math.floor(Math.random()*6);current().isInPrison=a!==b;endTurn();}else endTurn();
 });
-document.getElementById('new-game').addEventListener('click',newGame);
+const setupNames=['기사','장군','레인저','영주'];
+function renderPlayerSetup(){
+  const count=Number(document.getElementById('player-count').value),root=document.getElementById('player-setup');
+  const previous=[...root.querySelectorAll('.setup-player')].map(row=>({name:row.querySelector('input')?.value,type:row.querySelector('select')?.value}));
+  root.innerHTML=Array.from({length:count},(_,i)=>`<div class="setup-player" style="--slot:${i}"><span class="setup-avatar">${i+1}</span><input maxlength="12" value="${previous[i]?.name??setupNames[i]}" aria-label="${i+1}번 플레이어 이름"><select aria-label="${i+1}번 플레이어 종류"><option value="LOCAL" ${previous[i]?.type==='LOCAL'||(!previous[i]&&i===0)?'selected':''}>👤 사람 (로컬)</option><option value="AI" ${previous[i]?.type==='AI'||(!previous[i]&&i>0)?'selected':''}>🤖 AI</option><option value="ONLINE" ${previous[i]?.type==='ONLINE'?'selected':''}>🌐 사람 (온라인)</option></select></div>`).join('');
+}
+document.getElementById('player-count').addEventListener('change',renderPlayerSetup);
+document.getElementById('start-game').addEventListener('click',()=>{
+  const configs=[...document.querySelectorAll('.setup-player')].map((row,i)=>({name:row.querySelector('input').value.trim()||setupNames[i],controlType:row.querySelector('select').value}));
+  document.getElementById('title-screen').classList.add('hidden');newGame(configs);
+});
+document.getElementById('new-game').addEventListener('click',()=>document.getElementById('title-screen').classList.remove('hidden'));
 document.getElementById('log-toggle').addEventListener('click',()=>document.getElementById('log-panel').classList.toggle('open'));
-render(state,ui);
+renderPlayerSetup();render(state,ui);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');
