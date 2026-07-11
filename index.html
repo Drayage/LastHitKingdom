@@ -1,1 +1,32 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172554"><link rel="manifest" href="manifest.json"><title>Last Hit Kingdom</title><link rel="stylesheet" href="styles.css"></head><body><main id="app"><section class="hero"><h1>Last Hit Kingdom</h1><p>돈 없이 병력으로 몬스터를 정복하고, 영토를 발전시키고, 막타 승리를 노리는 판타지 영토 정복 주사위 게임.</p><button id="new-game">로컬 4인 시작</button></section><section class="hud"><div id="status"></div><div id="boss"></div></section><section id="board" class="board"></section><section class="panel"><h2>Action Log</h2><ol id="log"></ol></section></main><script type="module" src="js/main.js"></script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#7c3f22">
+  <link rel="manifest" href="manifest.json">
+  <title>Last Hit Kingdom</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <header class="topbar">
+      <div><span class="eyebrow">판타지 영토 정복 보드게임</span><h1>⚜ Last Hit Kingdom</h1></div>
+      <button id="new-game" class="secondary">새 게임</button>
+    </header>
+    <section id="player-cards" class="player-cards" aria-label="플레이어 현황"></section>
+    <section class="game-layout">
+      <div id="board" class="board" aria-label="왕국 보드">
+        <section id="boss-center" class="boss-center"></section>
+      </div>
+      <aside id="log-panel" class="log-panel">
+        <button id="log-toggle" class="log-toggle">📜 모험 기록 <span>펼치기</span></button>
+        <ol id="log"></ol>
+      </aside>
+    </section>
+    <section id="action-panel" class="action-panel" aria-live="polite"></section>
+  </main>
+  <div id="modal-root"></div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
