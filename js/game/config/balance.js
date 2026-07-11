@@ -11,5 +11,9 @@ export const BALANCE_CONFIG = {
   boss: { maxHp: 120 },
   traitOffer: { sameLevel: { optionCount: 3, rerollCount: 0 }, oneLevelBehind: { optionCount: 3, rerollCount: 1 }, twoOrMoreLevelsBehind: { optionCount: 4, rerollCount: 1 } },
 };
-export const PLAYER_COUNT_CONFIG = { 2: { bossHpMultiplier: 0.8, monsterHpMultiplier: 0.9 }, 3: { bossHpMultiplier: 1, monsterHpMultiplier: 1 }, 4: { bossHpMultiplier: 1.2, monsterHpMultiplier: 1.05 } };
+export const PLAYER_COUNT_CONFIG = {
+  2: { bossHpMultiplier: 0.8, monsterHpMultiplier: 0.9, startingTroopsMultiplier: 1.4, economyMultiplier: 1.35 },
+  3: { bossHpMultiplier: 1, monsterHpMultiplier: 1, startingTroopsMultiplier: 1.2, economyMultiplier: 1.15 },
+  4: { bossHpMultiplier: 1.2, monsterHpMultiplier: 1.05, startingTroopsMultiplier: 1, economyMultiplier: 1 },
+};
 export function scaledValue(base, line) { return Math.round(base * BALANCE_CONFIG.lineMultiplier[line]); }

@@ -1,3 +1,4 @@
-import { scaledValue } from '../config/balance.js';
+import { scaledValue } from '../config/balance.js?v=0.2.1';
 import { calculateFriendlySupport, levelConfig } from './support.js';
-export function calculatePassageDamage(state, territoryId) { const t = state.territories[territoryId]; if (!t.ownerId || t.level === 0) return 0; return scaledValue(levelConfig(t).passageDamage, t.line) + calculateFriendlySupport(state, territoryId, t.ownerId); }
+export function calculatePassageDamage(state, territoryId) { const t = state.territories[territoryId]; if (!t.ownerId || t.level === 0) return 0; const base=scaledValue(levelConfig(t).passageDamage, t.line) + calculateFriendlySupport(state, territoryId, t.ownerId); return Math.round(base*(state.economyMultiplier??1)); }
+export function payPassageDamage(state, playerId, territoryId) { const payer=state.players.find(p=>p.id===playerId),t=state.territories[territoryId],owner=state.players.find(p=>p.id===t?.ownerId); if(!payer||!t||!owner||owner.id===payer.id)return {amount:0,ownerId:null}; const amount=Math.min(payer.troops,calculatePassageDamage(state,territoryId)); payer.troops-=amount;owner.troops+=amount;state.actionLog.push({type:'PASSAGE_DAMAGE',playerId,ownerId:owner.id,territoryId,damage:amount});return {amount,ownerId:owner.id}; }
