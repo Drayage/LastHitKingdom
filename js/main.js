@@ -53,7 +53,21 @@ function openDecision(kind){
   root.innerHTML=`<div class="modal-backdrop">${modalMarkup(data,kind)}</div>`;
   const range=root.querySelector('#troop-range');
   range?.addEventListener('input',()=>{root.querySelector('#troop-output').textContent=range.value;root.querySelector('#combat-preview').textContent=`직접 병력 ${range.value}을 투입합니다.`;});
-  root.addEventListener('click',e=>{const choice=e.target.dataset.choice;if(!choice)return;if(choice==='confirm'){if(kind==='monster')dispatchGameAction(state,{type:'ATTACK_MONSTER',playerId:current().id,territoryId:t.id,directTroops:+range.value,endTurn:false});if(kind==='conquest')dispatchGameAction(state,{type:'CONQUEST',playerId:current().id,territoryId:t.id,directTroops:+range.value,endTurn:false});if(kind==='upgrade')dispatchGameAction(state,{type:'UPGRADE',playerId:current().id,territoryId:t.id,endTurn:false});}root.innerHTML='';checkDeficitOrProgress();},{once:true});
+  root.onclick=e=>{
+    const button=e.target.closest('[data-choice]'); if(!button)return;
+    if(button.dataset.choice==='skip'){root.innerHTML='';root.onclick=null;endTurn();return;}
+    try{
+      const troops=range?Math.max(0,Math.min(current().troops,Number(range.value)||0)):0;
+      if(kind==='monster')dispatchGameAction(state,{type:'ATTACK_MONSTER',playerId:current().id,territoryId:t.id,directTroops:troops,endTurn:false});
+      if(kind==='conquest')dispatchGameAction(state,{type:'CONQUEST',playerId:current().id,territoryId:t.id,directTroops:troops,endTurn:false});
+      if(kind==='upgrade')dispatchGameAction(state,{type:'UPGRADE',playerId:current().id,territoryId:t.id,endTurn:false});
+      root.innerHTML='';root.onclick=null;checkDeficitOrProgress();
+    }catch(error){
+      const preview=root.querySelector('.combat-preview');
+      if(preview)preview.textContent='행동을 처리할 수 없습니다. 병력 수를 다시 확인해주세요.';
+      console.error(error);
+    }
+  };
 }
 function checkDeficitOrProgress(){ if(current().troops<0&&current().ownedTerritoryIds.length)return openRelease(); maybeOfferTrait(); }
 function openRelease(){

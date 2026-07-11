@@ -20,7 +20,11 @@ function tokenMarkup(state,index){
   }).join('');
 }
 function boardPosition(i,total){
-  const side=Math.ceil(total/4), segment=Math.min(3,Math.floor(i/side)), offset=i-segment*side, pct=(offset/Math.max(1,side-1))*100;
+  const base=Math.floor(total/4), extra=total%4;
+  const counts=[0,1,2,3].map(n=>base+(n<extra?1:0));
+  let segment=0,start=0;
+  while(segment<3&&i>=start+counts[segment]){start+=counts[segment];segment++;}
+  const offset=i-start, pct=((offset+.5)/counts[segment])*100;
   if(segment===0) return `grid-area:top;left:${pct}%`;
   if(segment===1) return `grid-area:right;top:${pct}%`;
   if(segment===2) return `grid-area:bottom;right:${pct}%`;
